@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>솥뚜껑 포럼</title>
+  <meta name="description" content="뜨겁게 끓고, 든든하게 덮어주는 이야기 마당 — 솥뚜껑 포럼">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><ellipse cx='32' cy='42' rx='28' ry='10' fill='%23333'/><path d='M6 40 Q32 10 58 40Z' fill='%23444'/><rect x='27' y='14' width='10' height='8' rx='3' fill='%23c0602a'/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap header-inner">
+      <a class="brand" href="#/" aria-label="솥뚜껑 포럼 홈">
+        <svg class="logo" viewBox="0 0 64 64" aria-hidden="true">
+          <ellipse cx="32" cy="44" rx="28" ry="9" fill="currentColor" opacity=".35"/>
+          <path d="M5 42 Q32 8 59 42 Z" fill="currentColor"/>
+          <rect x="26" y="12" width="12" height="9" rx="3" fill="var(--accent)"/>
+          <path class="steam" d="M22 6 q3 -4 0 -8 M32 4 q3 -4 0 -8 M42 6 q3 -4 0 -8" stroke="var(--muted)" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
+        <span>솥뚜껑 포럼</span>
+      </a>
+      <nav class="header-actions">
+        <button id="themeToggle" class="icon-btn" type="button" aria-label="테마 바꾸기">◐</button>
+        <a class="btn btn-primary" href="#/write">글쓰기</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap" id="app" tabindex="-1"></main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <p>© 솥뚜껑 포럼 · 글은 이 브라우저에만 저장돼요.</p>
+    </div>
+  </footer>
+
+  <template id="tpl-home">
+    <section class="hero">
+      <h1>뜨겁게 끓고, 든든하게 덮어주는 이야기 마당</h1>
+      <p>잡담부터 질문, 정보 공유까지. 솥뚜껑 위에서 지글지글 나눠요.</p>
+    </section>
+
+    <div class="toolbar">
+      <div class="tabs" role="tablist" id="categoryTabs"></div>
+      <div class="toolbar-right">
+        <input id="searchInput" type="search" placeholder="제목·내용 검색" aria-label="검색">
+        <select id="sortSelect" aria-label="정렬">
+          <option value="new">최신순</option>
+          <option value="hot">인기순</option>
+          <option value="comments">댓글순</option>
+        </select>
+      </div>
+    </div>
+
+    <ul class="post-list" id="postList"></ul>
+    <p class="empty" id="emptyState" hidden>아직 글이 없어요. 첫 글을 올려보세요!</p>
+  </template>
+
+  <template id="tpl-write">
+    <section class="card">
+      <h1 class="page-title">새 글 쓰기</h1>
+      <form id="writeForm" class="form" novalidate>
+        <div class="row">
+          <label>카테고리
+            <select name="category" required></select>
+          </label>
+          <label>닉네임
+            <input name="author" maxlength="20" placeholder="익명의 솥뚜껑" autocomplete="nickname">
+          </label>
+        </div>
+        <label>제목
+          <input name="title" maxlength="80" required placeholder="제목을 입력하세요">
+        </label>
+        <label>내용
+          <textarea name="body" rows="10" maxlength="5000" required placeholder="하고 싶은 이야기를 적어주세요"></textarea>
+        </label>
+        <p class="form-error" id="formError" role="alert"></p>
+        <div class="form-actions">
+          <a class="btn" href="#/">취소</a>
+          <button class="btn btn-primary" type="submit">올리기</button>
+        </div>
+      </form>
+    </section>
+  </template>
+
+  <script src="app.js"></script>
+</body>
+</html>
