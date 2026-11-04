@@ -761,6 +761,8 @@ textarea { resize: vertical; min-height: 120px; }
 }
 .people li:has(.person-btn:hover), .people li:has(.person-btn[aria-expanded="true"]) { border-color: var(--green); }
 .people-label small { font-weight: 500; }
+.person-btn { display: inline-flex; align-items: center; gap: 6px; }
+.chip-photo { width: 22px; height: 22px; border-radius: 50%; object-fit: cover; margin-left: -6px; }
 
 .bio-panel {
   margin: 10px 0 4px;

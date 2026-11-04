@@ -37,7 +37,7 @@
       1: {
         date: '2026-10-30',
         guests: [{
-          name: '김소윤', role: '쿨라이밋 대표',
+          name: '김소윤', role: '쿨라이밋 대표', photo: 'images/member-kimsoyun.webp',
           bio: '청년 기후단체 쿨라이밋(COOLIMATE)의 대표예요. '
             + '청(소)년 기후변화 컨퍼런스 LCOY Korea를 열고, 청년들이 함께 쓴 기후성명서를 국회에 전달해 왔어요.',
         }],
@@ -239,7 +239,7 @@
 
   const personChip = (p, guest) => `<li class="${guest ? 'guest' : ''}">
       <button type="button" class="person-btn" data-person="${personId(p)}" aria-expanded="false">
-        <b>${escapeHtml(p.name)}</b> · ${escapeHtml(p.role)}
+        ${p.photo ? `<img class="chip-photo" src="${escapeHtml(p.photo)}" alt="" loading="lazy">` : ''}<b>${escapeHtml(p.name)}</b> · ${escapeHtml(p.role)}
       </button></li>`;
 
   const avatarHtml = (p) => (p.photo
