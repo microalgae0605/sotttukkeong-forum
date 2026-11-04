@@ -177,12 +177,13 @@
     });
     let raf = 0;
     const onScroll = () => { if (!raf) raf = requestAnimationFrame(() => { raf = 0; sweep(); }); };
-    addEventListener('scroll', onScroll, { passive: true });
-    addEventListener('hashchange', () => removeEventListener('scroll', onScroll), { once: true });
+    addEventListener('scroll', onScroll, { passive: true, signal: viewCtl.signal });
   }
 
   // 화면이 바뀐 뒤 늦게 도착한 응답이 화면을 덮어쓰지 않도록 하는 장치
   let viewToken = 0;
+  // 화면을 바꿀 때 이전 화면의 이벤트 리스너를 한꺼번에 정리해요
+  let viewCtl = new AbortController();
 
   // ---------- theme ----------
   const themeToggle = document.getElementById('themeToggle');
@@ -277,7 +278,7 @@
       panel.setAttribute('role', 'region');
       panel.innerHTML = bioHtml(people[Number(btn.dataset.person)]);
       host.after(panel);
-    });
+    }, { signal: viewCtl.signal });
   }
 
   function renderDinner() {
@@ -439,6 +440,8 @@
 
   // ---------- router ----------
   function route() {
+    viewCtl.abort();
+    viewCtl = new AbortController();
     const hash = location.hash || '#/';
     let section = 'home';
     if (hash === '#/dinner') { renderDinner(); section = 'dinner'; }
