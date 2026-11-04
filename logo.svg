@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="230 180 1416 1180">
+<style>.logo-tree{fill:#2f8f50}.logo-leaf{fill:#7fc24d}.logo-ink{fill:#20362b}.logo-shine{stroke:#fff}</style>
+<path class="logo-tree" d="M413 478Q436 450 460 478L555 830Q560 860 528 860H345Q313 860 320 830Z"/>
+<circle class="logo-leaf" cx="655" cy="566" r="138"/>
+<rect class="logo-ink" x="627" y="690" width="56" height="170" rx="14"/>
+<path class="logo-tree" d="M914 218Q938 190 962 218L1113 830Q1118 860 1086 860H790Q758 860 764 830Z"/>
+<circle class="logo-leaf" cx="1217" cy="598" r="130"/>
+<rect class="logo-ink" x="1189" y="710" width="56" height="150" rx="14"/>
+<path class="logo-tree" d="M1416 446Q1439 418 1462 446L1557 830Q1562 860 1530 860H1348Q1316 860 1322 830Z"/>
+<rect class="logo-ink" x="243" y="881" width="1390" height="105" rx="52"/>
+<path class="logo-ink" d="M405 1007H1471C1471 1140 1240 1248 938 1248C636 1248 405 1140 405 1007Z"/>
+<path class="logo-shine" d="M535 1057Q590 1125 683 1145" fill="none" stroke-width="36" stroke-linecap="round"/>
+<path class="logo-ink" d="M808 1262Q938 1275 1067 1262V1318Q1067 1346 1039 1346H836Q808 1346 808 1318Z"/>
+</svg>

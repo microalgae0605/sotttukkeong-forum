@@ -38,3 +38,4 @@ python3 -m http.server 8000
 | `index.html` | 페이지 뼈대와 화면 템플릿 |
 | `style.css` | 디자인 (라이트/다크 테마) |
 | `app.js` | 글·댓글·좋아요 기능과 화면 전환 |
+| `logo.svg` | 로고 (브라우저 탭 아이콘) |

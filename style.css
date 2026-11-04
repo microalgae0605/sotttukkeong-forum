@@ -9,6 +9,8 @@
   --accent-soft: #f6e4d8;
   --shadow: 0 1px 2px rgba(43, 38, 34, .06), 0 4px 16px rgba(43, 38, 34, .05);
   --radius: 12px;
+  --logo-ink: #20362b;
+  --logo-shine: #ffffff;
   color-scheme: light;
 }
 
@@ -23,6 +25,8 @@
     --accent-ink: #1b1816;
     --accent-soft: #3a2a20;
     --shadow: none;
+    --logo-ink: #b9d3c1;
+    --logo-shine: #1b1816;
     color-scheme: dark;
   }
 }
@@ -37,6 +41,8 @@
   --accent-ink: #1b1816;
   --accent-soft: #3a2a20;
   --shadow: none;
+  --logo-ink: #b9d3c1;
+  --logo-shine: #1b1816;
   color-scheme: dark;
 }
 
@@ -93,17 +99,11 @@ main.wrap { flex: 1; padding-top: 24px; padding-bottom: 48px; outline: none; }
   letter-spacing: -.02em;
 }
 
-.logo { width: 34px; height: 34px; color: var(--text); overflow: visible; }
-.logo .steam { animation: steam 2.4s ease-in-out infinite; transform-origin: center; }
-
-@keyframes steam {
-  0%, 100% { opacity: .2; transform: translateY(2px); }
-  50% { opacity: .9; transform: translateY(-1px); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .logo .steam { animation: none; opacity: .6; }
-}
+.logo { width: 41px; height: 34px; }
+.logo .logo-tree { fill: #2f8f50; }
+.logo .logo-leaf { fill: #7fc24d; }
+.logo .logo-ink { fill: var(--logo-ink); }
+.logo .logo-shine { stroke: var(--logo-shine); }
 
 .header-actions { display: flex; align-items: center; gap: 8px; }
 
