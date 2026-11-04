@@ -18,17 +18,17 @@
     // bio: 이름을 누르면 나오는 간단 소개 (공개된 자료를 바탕으로 쓴 초안이에요)
     hosts: [
       {
-        name: '이동호', role: '성북구 구의원',
+        name: '이동호', role: '성북구 구의원', photo: 'images/member-leedongho.webp',
         bio: '성북구의회 의원으로 길음2동·월곡1동·월곡2동 지역을 맡고 있어요. '
           + '국민대학교 경영정보학부를 졸업했고, 서울시 지속가능발전위원회와 녹색서울시민위원회 위원으로도 활동하고 있어요.',
       },
       {
-        name: '김덕원', role: '환경을 생각하는 사람들 공동대표',
+        name: '김덕원', role: '환경을 생각하는 사람들 공동대표', photo: 'images/member-kimdeokwon.webp',
         bio: '\'앨지닥터\'로 활동하는 환경 연구자이자 과학 커뮤니케이터예요. '
           + '환경정보 종합 플랫폼 \'앨지닥터\'를 운영하며, 환경을 생각하는 사람들 공동대표로도 활동하고 있어요.',
       },
       {
-        name: '김익수', role: '환경일보 대표',
+        name: '김익수', role: '환경일보 대표', photo: 'images/member-kimiksu.webp',
         bio: '환경 전문 언론사 환경일보의 대표이사이자 편집대표예요. '
           + '탄소중립과 지속가능한 삶을 주제로 여러 기관과 협력하고, 칼럼으로도 꾸준히 목소리를 내고 있어요.',
       },
@@ -242,9 +242,13 @@
         <b>${escapeHtml(p.name)}</b> · ${escapeHtml(p.role)}
       </button></li>`;
 
+  const avatarHtml = (p) => (p.photo
+    ? `<div class="avatar has-photo" aria-hidden="true"><img src="${escapeHtml(p.photo)}" alt="" loading="lazy"></div>`
+    : `<div class="avatar" aria-hidden="true">${escapeHtml(p.name.slice(1, 2))}</div>`);
+
   const bioHtml = (p) => `
       <div class="bio-head">
-        <div class="avatar" aria-hidden="true">${escapeHtml(p.name.slice(1, 2))}</div>
+        ${avatarHtml(p)}
         <div><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml(p.role)}</span></div>
         <button type="button" class="bio-close" aria-label="소개 닫기">×</button>
       </div>
@@ -298,7 +302,7 @@
     document.getElementById('memberGrid').innerHTML = DINNER.hosts.map((h) => `
       <li>
         <button type="button" class="member" data-person="${personId(h)}" aria-expanded="false">
-          <div class="avatar" aria-hidden="true">${escapeHtml(h.name.slice(1, 2))}</div>
+          ${avatarHtml(h)}
           <strong>${escapeHtml(h.name)}</strong>
           <span>${escapeHtml(h.role)}</span>
           <em class="member-more">소개 보기</em>

@@ -563,15 +563,16 @@ textarea { resize: vertical; min-height: 120px; }
 }
 .env-seal {
   position: absolute; left: 50%; top: 60%;
-  width: 54px; height: 54px; margin: -27px 0 0 -27px;
+  width: 76px; height: 76px; margin: -38px 0 0 -38px;
   border-radius: 50%;
-  background: var(--accent);
+  background: #fffdf8;
+  border: 3px solid var(--accent);
   display: grid; place-items: center;
   z-index: 5;
   opacity: 0;
-  box-shadow: 0 2px 6px rgba(0,0,0,.2);
+  box-shadow: 0 0 0 3px #fffdf8, 0 3px 10px rgba(0,0,0,.25);
 }
-.env-seal svg { width: 34px; height: 30px; }
+.env-seal svg { width: 50px; height: 42px; }
 
 .letter {
   position: absolute;
@@ -784,6 +785,12 @@ textarea { resize: vertical; min-height: 120px; }
   border: 1px solid var(--line); background: var(--surface); color: var(--text);
   font-size: 1.1rem; line-height: 1; cursor: pointer;
 }
+.avatar.has-photo { overflow: hidden; background: var(--paper); padding: 0; }
+.avatar.has-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.member .avatar.has-photo { width: 72px; height: 72px; box-shadow: 0 0 0 3px var(--surface), 0 0 0 5px color-mix(in srgb, var(--green) 35%, transparent); }
+.member:hover .avatar.has-photo img { transform: scale(1.06); }
+.member .avatar.has-photo img { transition: transform .4s ease; }
+.bio-head .avatar.has-photo { width: 44px; height: 44px; }
 @keyframes bioOpen { from { opacity: 0; transform: translateY(-6px) scaleY(.96); } }
 
 /* =========================================================
@@ -796,7 +803,7 @@ textarea { resize: vertical; min-height: 120px; }
   .teaser { grid-template-columns: 1fr; }
   .soon-grid { grid-template-columns: 1fr; }
   .member-grid { grid-template-columns: 1fr; }
-  .member { display: grid; grid-template-columns: 56px 1fr; text-align: left; gap: 0 14px; align-items: center; padding: 14px 16px; }
+  .member { display: grid; grid-template-columns: 72px 1fr; text-align: left; gap: 0 14px; align-items: center; padding: 14px 16px; }
   .member .avatar { grid-row: span 3; margin: 0; }
   .member-more { margin-top: 2px; }
   .review-form .row { grid-template-columns: 1fr; }
