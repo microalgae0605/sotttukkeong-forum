@@ -6,7 +6,7 @@
   <title>솥뚜껑 포럼</title>
   <meta name="description" content="뜨겁게 끓고, 든든하게 덮어주는 이야기 마당 — 솥뚜껑 포럼">
   <link rel="icon" type="image/svg+xml" href="logo.svg">
-  <link rel="stylesheet" href="style.css?v=3">
+  <link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
   <header class="site-header">
@@ -27,10 +27,14 @@
         </svg>
         <span>솥뚜껑 포럼</span>
       </a>
-      <nav class="header-actions">
+      <nav class="main-nav" aria-label="주요 메뉴">
+        <a href="#/" data-nav="home">홈</a>
+        <a href="#/dinner" data-nav="dinner">솥뚜껑 저녁 모임</a>
+      </nav>
+      <div class="header-actions">
         <button id="themeToggle" class="icon-btn" type="button" aria-label="테마 바꾸기">◐</button>
         <a class="btn btn-primary" href="#/write">글쓰기</a>
-      </nav>
+      </div>
     </div>
   </header>
 
@@ -42,28 +46,175 @@
     </div>
   </footer>
 
+  <!-- ============ 홈 ============ -->
   <template id="tpl-home">
-    <section class="hero">
-      <h1>뜨겁게 끓고, 든든하게 덮어주는 이야기 마당</h1>
-      <p>잡담부터 질문, 정보 공유까지. 솥뚜껑 위에서 지글지글 나눠요.</p>
+    <section class="hero-stage" aria-label="솥뚜껑 포럼 소개">
+      <div class="hero-bg" aria-hidden="true">
+        <span></span><span></span><span></span><span></span>
+        <span></span><span></span><span></span><span></span>
+      </div>
+
+      <button type="button" class="hero-logo-btn" id="heroLogo" aria-label="솥뚜껑 두드리기">
+        <svg class="hero-logo" viewBox="230 40 1416 1320" aria-hidden="true">
+          <g class="h-steam">
+            <path d="M560 830 q-40 -90 0 -180 q40 -90 0 -180"/>
+            <path d="M1090 840 q-40 -90 0 -180 q40 -90 0 -180"/>
+            <path d="M1330 840 q-35 -80 0 -160 q35 -80 0 -160"/>
+          </g>
+          <g class="h-tree" style="--i:0"><g class="sway">
+            <path fill="#2f8f50" d="M413 478Q436 450 460 478L555 830Q560 860 528 860H345Q313 860 320 830Z"/>
+          </g></g>
+          <g class="h-tree" style="--i:1"><g class="sway">
+            <rect class="ink" x="627" y="690" width="56" height="170" rx="14"/>
+            <circle fill="#7fc24d" cx="655" cy="566" r="138"/>
+          </g></g>
+          <g class="h-tree" style="--i:2"><g class="sway">
+            <path fill="#2f8f50" d="M914 218Q938 190 962 218L1113 830Q1118 860 1086 860H790Q758 860 764 830Z"/>
+          </g></g>
+          <g class="h-tree" style="--i:3"><g class="sway">
+            <rect class="ink" x="1189" y="710" width="56" height="150" rx="14"/>
+            <circle fill="#7fc24d" cx="1217" cy="598" r="130"/>
+          </g></g>
+          <g class="h-tree" style="--i:4"><g class="sway">
+            <path fill="#2f8f50" d="M1416 446Q1439 418 1462 446L1557 830Q1562 860 1530 860H1348Q1316 860 1322 830Z"/>
+          </g></g>
+          <g class="h-lid">
+            <rect class="ink" x="243" y="881" width="1390" height="105" rx="52"/>
+          </g>
+          <g class="h-pot">
+            <path class="ink" d="M405 1007H1471C1471 1140 1240 1248 938 1248C636 1248 405 1140 405 1007Z"/>
+            <path class="h-shine" d="M535 1057Q590 1125 683 1145" fill="none" stroke-width="36" stroke-linecap="round"/>
+            <path class="ink" d="M808 1262Q938 1275 1067 1262V1318Q1067 1346 1039 1346H836Q808 1346 808 1318Z"/>
+          </g>
+        </svg>
+      </button>
+
+      <h1 class="hero-title">
+        <span style="--d:0">뜨겁게 끓고,</span>
+        <span style="--d:1">든든하게 덮어주는</span>
+        <span style="--d:2">이야기 마당</span>
+      </h1>
+      <p class="hero-sub">성북에서 환경과 동네를 고민하는 사람들이<br>솥뚜껑 위에 둘러앉아 이야기를 나눠요.</p>
+      <button type="button" class="scroll-cue" id="scrollCue" aria-label="아래로 이동">
+        <span aria-hidden="true">↓</span>
+      </button>
     </section>
 
-    <div class="toolbar">
-      <div class="tabs" role="tablist" id="categoryTabs"></div>
-      <div class="toolbar-right">
-        <input id="searchInput" type="search" placeholder="제목·내용 검색" aria-label="검색">
-        <select id="sortSelect" aria-label="정렬">
-          <option value="new">최신순</option>
-          <option value="hot">인기순</option>
-          <option value="comments">댓글순</option>
-        </select>
+    <section class="section reveal" id="dinnerTeaser">
+      <p class="eyebrow">PROJECT 01</p>
+      <div class="teaser card">
+        <div class="teaser-text">
+          <h2>솥뚜껑 저녁 모임</h2>
+          <p>매월 마지막 주 금요일 저녁, 솥뚜껑 하나를 가운데 두고 둘러앉아요.
+            고정 멤버 세 사람이 매달 새로운 손님을 초대합니다.</p>
+          <a class="btn btn-primary" href="#/dinner">초대장 열어보기 ✉️</a>
+        </div>
+        <div class="next-dinner" id="nextDinnerBox">
+          <div class="mini-pot" aria-hidden="true">
+            <span class="steam s1"></span><span class="steam s2"></span><span class="steam s3"></span>
+            <span class="lid"></span><span class="pot"></span>
+          </div>
+          <p class="next-label">다음 모임</p>
+          <p class="next-date" data-next-date></p>
+          <p class="next-dday" data-next-dday></p>
+        </div>
       </div>
-    </div>
+    </section>
 
-    <ul class="post-list" id="postList"></ul>
-    <p class="empty" id="emptyState" hidden>아직 글이 없어요. 첫 글을 올려보세요!</p>
+    <section class="section reveal">
+      <p class="eyebrow">COMING SOON</p>
+      <h2 class="section-title">준비 중인 프로젝트</h2>
+      <div class="soon-grid">
+        <div class="soon-card">
+          <div class="soon-lid" aria-hidden="true"><span>?</span></div>
+          <p class="soon-no">PROJECT 02</p>
+          <h3>뚜껑을 여는 중이에요</h3>
+          <p>새로운 프로젝트를 지글지글 준비하고 있어요.</p>
+        </div>
+        <div class="soon-card">
+          <div class="soon-lid" aria-hidden="true" style="--delay:.6s"><span>?</span></div>
+          <p class="soon-no">PROJECT 03</p>
+          <h3>재료를 고르는 중이에요</h3>
+          <p>곧 맛있게 끓여서 소개할게요.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section reveal" id="forum">
+      <p class="eyebrow">FORUM</p>
+      <h2 class="section-title">이야기 마당</h2>
+      <div class="toolbar">
+        <div class="tabs" role="tablist" id="categoryTabs"></div>
+        <div class="toolbar-right">
+          <input id="searchInput" type="search" placeholder="제목·내용 검색" aria-label="검색">
+          <select id="sortSelect" aria-label="정렬">
+            <option value="new">최신순</option>
+            <option value="hot">인기순</option>
+            <option value="comments">댓글순</option>
+          </select>
+        </div>
+      </div>
+
+      <ul class="post-list" id="postList"></ul>
+      <div id="listStatus"></div>
+      <p class="empty" id="emptyState" hidden>아직 글이 없어요. 첫 글을 올려보세요!</p>
+    </section>
   </template>
 
+  <!-- ============ 솥뚜껑 저녁 모임 ============ -->
+  <template id="tpl-dinner">
+    <section class="invite-stage" aria-label="초대장">
+      <div class="envelope" id="envelope">
+        <div class="env-back"></div>
+        <div class="letter">
+          <p class="letter-kicker">INVITATION</p>
+          <h1 class="letter-title">솥뚜껑 저녁 모임에<br>초대합니다</h1>
+          <p class="letter-when">매월 마지막 주 금요일 저녁</p>
+          <p class="letter-next" data-next-date-long></p>
+        </div>
+        <div class="env-pocket"></div>
+        <div class="env-flap"></div>
+        <div class="env-seal" aria-hidden="true">
+          <svg viewBox="230 180 1416 1180">
+            <path fill="#7fc24d" d="M914 218Q938 190 962 218L1113 830Q1118 860 1086 860H790Q758 860 764 830Z"/>
+            <rect fill="#fff" x="243" y="881" width="1390" height="105" rx="52"/>
+            <path fill="#fff" d="M405 1007H1471C1471 1140 1240 1248 938 1248C636 1248 405 1140 405 1007Z"/>
+          </svg>
+        </div>
+      </div>
+      <div class="invite-sparks" aria-hidden="true">
+        <span></span><span></span><span></span><span></span><span></span><span></span>
+      </div>
+      <button type="button" class="btn btn-ghost replay-btn" id="replayInvite">↺ 초대장 다시 열기</button>
+    </section>
+
+    <section class="section reveal">
+      <p class="eyebrow">ABOUT</p>
+      <h2 class="section-title">이 자리를 여는 이유</h2>
+      <div class="card about-card">
+        <p>솥뚜껑은 여럿이 둘러앉아야 제맛인 그릇입니다. 가운데 놓인 솥뚜껑 하나에 모두의 젓가락이 모이듯,
+          <strong>한 달에 한 번, 성북에서 환경과 동네를 고민하는 사람들이 한 상에 모입니다.</strong></p>
+        <p>회의실이 아닌 밥상에서, 직함보다 이름으로 만나 서로의 일과 고민을 듣습니다.
+          구의회, 시민단체, 언론, 그리고 매달 새롭게 초대하는 손님이 함께 지글지글 이야기를 나누며
+          우리 동네의 다음 걸음을 궁리합니다.</p>
+        <p class="about-motto">뜨겁게 이야기하고, 든든하게 덮어주는 저녁.</p>
+      </div>
+    </section>
+
+    <section class="section reveal">
+      <p class="eyebrow">HOSTS</p>
+      <h2 class="section-title">고정 멤버</h2>
+      <ul class="member-grid" id="memberGrid"></ul>
+    </section>
+
+    <section class="section">
+      <p class="eyebrow">ROUNDS</p>
+      <h2 class="section-title">모임 기록</h2>
+      <ol class="timeline" id="roundList"></ol>
+    </section>
+  </template>
+
+  <!-- ============ 글쓰기 ============ -->
   <template id="tpl-write">
     <section class="card">
       <h1 class="page-title">새 글 쓰기</h1>
@@ -94,6 +245,6 @@
     </section>
   </template>
 
-  <script src="app.js?v=3"></script>
+  <script src="app.js?v=4"></script>
 </body>
 </html>

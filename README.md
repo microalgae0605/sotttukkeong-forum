@@ -6,6 +6,8 @@
 
 ## 기능
 
+- 첫 화면 모션 그래픽(솥뚜껑 위로 숲이 자라는 인트로)
+- 솥뚜껑 저녁 모임: 초대장 애니메이션, 취지, 고정 멤버, 회차별 기록·사진·참여 후기
 - 글 목록: 카테고리 탭(잡담·질문·정보·자랑), 검색, 정렬(최신·인기·댓글순)
 - 글쓰기, 글 보기, 글 삭제
 - 좋아요, 댓글
@@ -17,7 +19,7 @@
 
 ## Supabase 설정
 
-1. Supabase 프로젝트의 **SQL Editor**에서 [`supabase/schema.sql`](supabase/schema.sql) 내용을 붙여넣고 **Run** (처음 한 번만)
+1. Supabase 프로젝트의 **SQL Editor**에서 [`supabase/schema.sql`](supabase/schema.sql), [`supabase/dinner_reviews.sql`](supabase/dinner_reviews.sql) 내용을 차례로 붙여넣고 **Run** (처음 한 번만)
 2. `app.js` 맨 위의 `SUPABASE_URL`, `SUPABASE_KEY`(publishable 키)를 내 프로젝트 값으로 설정
    - ⚠️ `secret` / `service_role` 키는 절대 코드에 넣지 마세요.
 3. 무료 플랜은 일주일 동안 사용이 없으면 일시정지돼요. Supabase 화면에서 **Restore**를 누르면 다시 켜져요.
@@ -47,3 +49,5 @@ python3 -m http.server 8000
 | `app.js` | 글·댓글·좋아요 기능(Supabase 연결)과 화면 전환 |
 | `logo.svg` | 로고 (브라우저 탭 아이콘) |
 | `supabase/schema.sql` | 데이터베이스 표·보안 규칙 설정 |
+| `supabase/dinner_reviews.sql` | 저녁 모임 후기·참여자 코드 설정 |
+| `images/` | 모임 사진 |
