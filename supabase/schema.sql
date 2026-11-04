@@ -92,3 +92,13 @@ insert into public.posts (category, title, body, author) values (
   E'어서 오세요! 여기는 솥뚜껑 포럼입니다.\n\n뜨거운 이야기도, 소소한 이야기도 다 환영해요.\n서로 존중하면서 즐겁게 이야기 나눠요.',
   '운영자'
 );
+
+-- 방문자(로그인 안 한 사람) 권한을 확실히 켜기
+-- (이미 켜져 있어도 다시 실행해도 괜찮아요)
+create extension if not exists pgcrypto with schema extensions;
+grant usage on schema public to anon, authenticated;
+grant select on public.posts, public.comments to anon, authenticated;
+grant insert (post_id, author, body) on public.comments to anon, authenticated;
+grant execute on function public.create_post(text, text, text, text, text) to anon, authenticated;
+grant execute on function public.delete_post(uuid, text) to anon, authenticated;
+grant execute on function public.like_post(uuid, integer) to anon, authenticated;
