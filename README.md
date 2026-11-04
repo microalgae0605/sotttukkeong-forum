@@ -13,7 +13,7 @@
 - 모바일 화면 지원
 
 > 저녁 모임 후기는 [Supabase](https://supabase.com) 데이터베이스에 저장되어 모든 사람이 함께 봐요.
-> 회차별 **참여자 코드**가 있어야 후기를 쓸 수 있어요. 운영자는 Supabase 화면(Table Editor → `dinner_reviews`)에서 후기를 지울 수 있어요.
+> **참여자 코드**(모든 회차 공통)가 있어야 후기를 쓸 수 있어요. 운영자는 Supabase 화면(Table Editor → `dinner_reviews`)에서 후기를 지울 수 있어요.
 >
 > 이야기 마당(게시판)은 지금은 꺼 두었어요. 예전 코드는 Git 기록에 남아 있어요.
 

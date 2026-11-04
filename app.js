@@ -15,15 +15,34 @@
   const DINNER = {
     firstYear: 2026,
     firstMonth: 10, // 1회차: 2026년 10월
+    // bio: 이름을 누르면 나오는 간단 소개 (공개된 자료를 바탕으로 쓴 초안이에요)
     hosts: [
-      { name: '이동호', role: '성북구 구의원' },
-      { name: '김덕원', role: '환경을 생각하는 사람들 공동대표' },
-      { name: '김익수', role: '환경일보 대표' },
+      {
+        name: '이동호', role: '성북구 구의원',
+        bio: '성북구의회 의원으로 길음2동·월곡1동·월곡2동 지역을 맡고 있어요. '
+          + '국민대학교 경영정보학부를 졸업했고, 서울시 지속가능발전위원회와 녹색서울시민위원회 위원으로도 활동하고 있어요.',
+      },
+      {
+        name: '김덕원', role: '환경을 생각하는 사람들 공동대표',
+        bio: '\'앨지닥터\'라는 이름으로 활동하는 연구자예요. 환경공학 박사과정을 수료했고, '
+          + '배운 것을 실천으로 옮기는 단체 \'환경을 생각하는 사람들(환생사)\'의 공동대표로 '
+          + '청년들의 기후불안을 함께 다루는 프로그램과 워크숍을 꾸려 왔어요.',
+      },
+      {
+        name: '김익수', role: '환경일보 대표',
+        bio: '환경 전문 언론사 환경일보의 대표이사이자 편집대표예요. '
+          + '탄소중립과 지속가능한 삶을 주제로 여러 기관과 협력하고, 칼럼으로도 꾸준히 목소리를 내고 있어요.',
+      },
     ],
     rounds: {
       1: {
         date: '2026-10-30',
-        guests: [{ name: '김소윤', role: '쿨라이밋 대표' }],
+        guests: [{
+          name: '김소윤', role: '쿨라이밋 대표',
+          bio: '청년 기후단체 쿨라이밋(COOLIMATE)의 대표예요. '
+            + '청(소)년 기후변화 컨퍼런스 LCOY Korea를 열고, 청년들이 함께 쓴 기후성명서를 국회에 전달하는 등 '
+            + '청년이 변화의 주체가 되는 자리를 만들어 가고 있어요.',
+        }],
         photo: 'images/dinner-01.webp',
         photoAlt: '1회차 모임에서 참석자들이 솥뚜껑 테이블에 둘러앉아 손을 모으고 웃고 있는 모습',
       },
@@ -217,8 +236,47 @@
   }
 
   // ---------- 솥뚜껑 저녁 모임 ----------
-  const personChip = (p, guest) =>
-    `<li class="${guest ? 'guest' : ''}"><b>${escapeHtml(p.name)}</b> · ${escapeHtml(p.role)}</li>`;
+  const people = [];
+  const personId = (p) => { let i = people.indexOf(p); if (i < 0) { people.push(p); i = people.length - 1; } return i; };
+
+  const personChip = (p, guest) => `<li class="${guest ? 'guest' : ''}">
+      <button type="button" class="person-btn" data-person="${personId(p)}" aria-expanded="false">
+        <b>${escapeHtml(p.name)}</b> · ${escapeHtml(p.role)}
+      </button></li>`;
+
+  const bioHtml = (p) => `
+      <div class="bio-head">
+        <div class="avatar" aria-hidden="true">${escapeHtml(p.name.slice(1, 2))}</div>
+        <div><strong>${escapeHtml(p.name)}</strong><span>${escapeHtml(p.role)}</span></div>
+        <button type="button" class="bio-close" aria-label="소개 닫기">×</button>
+      </div>
+      <p>${escapeHtml(p.bio || '소개를 준비하고 있어요.')}</p>`;
+
+  // 이름을 누르면 바로 아래에 간단 소개가 열려요
+  function setupBios(root) {
+    root.addEventListener('click', (e) => {
+      const close = e.target.closest('.bio-close');
+      if (close) {
+        const panel = close.closest('.bio-panel');
+        root.querySelectorAll(`[data-person][aria-expanded="true"]`).forEach((b) => b.setAttribute('aria-expanded', 'false'));
+        panel.remove();
+        return;
+      }
+      const btn = e.target.closest('[data-person]');
+      if (!btn) return;
+      const host = btn.closest('.people, .member-grid');
+      const open = btn.getAttribute('aria-expanded') === 'true';
+      host.parentElement.querySelectorAll(':scope > .bio-panel').forEach((x) => x.remove());
+      host.querySelectorAll('[data-person]').forEach((b) => b.setAttribute('aria-expanded', 'false'));
+      if (open) return;
+      btn.setAttribute('aria-expanded', 'true');
+      const panel = document.createElement('div');
+      panel.className = 'bio-panel';
+      panel.setAttribute('role', 'region');
+      panel.innerHTML = bioHtml(people[Number(btn.dataset.person)]);
+      host.after(panel);
+    });
+  }
 
   function renderDinner() {
     const token = ++viewToken;
@@ -240,11 +298,15 @@
 
     // 고정 멤버
     document.getElementById('memberGrid').innerHTML = DINNER.hosts.map((h) => `
-      <li class="member">
-        <div class="avatar" aria-hidden="true">${escapeHtml(h.name.slice(1, 2))}</div>
-        <strong>${escapeHtml(h.name)}</strong>
-        <span>${escapeHtml(h.role)}</span>
+      <li>
+        <button type="button" class="member" data-person="${personId(h)}" aria-expanded="false">
+          <div class="avatar" aria-hidden="true">${escapeHtml(h.name.slice(1, 2))}</div>
+          <strong>${escapeHtml(h.name)}</strong>
+          <span>${escapeHtml(h.role)}</span>
+          <em class="member-more">소개 보기</em>
+        </button>
       </li>`).join('');
+    setupBios(app);
 
     // 회차 목록 (1회차부터 아래로)
     const list = document.getElementById('roundList');
@@ -264,7 +326,7 @@
             ${r.photo ? `<figure class="round-photo">
               <img src="${escapeHtml(r.photo)}" alt="${escapeHtml(r.photoAlt || `${no}회차 모임 사진`)}" loading="lazy">
             </figure>` : ''}
-            <p class="people-label">함께한 사람</p>
+            <p class="people-label">함께한 사람 <small>· 이름을 누르면 소개가 나와요</small></p>
             <ul class="people">
               ${DINNER.hosts.map((h) => personChip(h, false)).join('')}
               ${guests.map((g) => personChip(g, true)).join('')}
