@@ -12,8 +12,15 @@
 - 라이트/다크 테마 전환
 - 모바일 화면 지원
 
-> 글은 브라우저의 `localStorage`에 저장됩니다. 다른 기기나 다른 사람과는 공유되지 않아요.
-> 여러 사람이 함께 쓰려면 나중에 서버나 데이터베이스(예: Supabase, Firebase)를 붙이면 됩니다.
+> 글·댓글·좋아요는 [Supabase](https://supabase.com) 데이터베이스에 저장되어 모든 사람이 함께 봐요.
+> 글을 쓸 때 정한 **삭제 비밀번호**가 있어야 글을 지울 수 있어요. 운영자는 Supabase 화면(Table Editor → `posts`)에서 어떤 글이든 지울 수 있어요.
+
+## Supabase 설정
+
+1. Supabase 프로젝트의 **SQL Editor**에서 [`supabase/schema.sql`](supabase/schema.sql) 내용을 붙여넣고 **Run** (처음 한 번만)
+2. `app.js` 맨 위의 `SUPABASE_URL`, `SUPABASE_KEY`(publishable 키)를 내 프로젝트 값으로 설정
+   - ⚠️ `secret` / `service_role` 키는 절대 코드에 넣지 마세요.
+3. 무료 플랜은 일주일 동안 사용이 없으면 일시정지돼요. Supabase 화면에서 **Restore**를 누르면 다시 켜져요.
 
 ## 실행
 
@@ -37,5 +44,6 @@ python3 -m http.server 8000
 | --- | --- |
 | `index.html` | 페이지 뼈대와 화면 템플릿 |
 | `style.css` | 디자인 (라이트/다크 테마) |
-| `app.js` | 글·댓글·좋아요 기능과 화면 전환 |
+| `app.js` | 글·댓글·좋아요 기능(Supabase 연결)과 화면 전환 |
 | `logo.svg` | 로고 (브라우저 탭 아이콘) |
+| `supabase/schema.sql` | 데이터베이스 표·보안 규칙 설정 |

@@ -1,15 +1,22 @@
 (() => {
   'use strict';
 
-  const STORAGE_KEY = 'sotttukkeong-forum:v1';
+  // ---------- Supabase 연결 정보 ----------
+  // publishable 키는 공개용 키라서 코드에 넣어도 괜찮아요.
+  // (secret / service_role 키는 절대 여기에 넣지 마세요.)
+  const SUPABASE_URL = 'https://znsvaelbahbxktwyxjnd.supabase.co';
+  const SUPABASE_KEY = 'sb_publishable_2fr5YSlFRZ25AqdDBB2v5Q_mfNRwIIC';
+
   const THEME_KEY = 'sotttukkeong-forum:theme';
   const LIKED_KEY = 'sotttukkeong-forum:liked';
+  const AUTHOR_KEY = 'sotttukkeong-forum:author';
   const CATEGORIES = ['잡담', '질문', '정보', '자랑'];
   const DEFAULT_AUTHOR = '익명의 솥뚜껑';
+  const POST_FIELDS = 'id,category,title,body,author,likes,created_at';
 
   const app = document.getElementById('app');
 
-  // ---------- storage ----------
+  // ---------- local storage (테마, 좋아요 표시, 닉네임만 저장) ----------
   const storage = {
     get(key, fallback) {
       try {
@@ -24,67 +31,70 @@
     },
   };
 
-  const now = Date.now();
-  const HOUR = 3600 * 1000;
-  const seedPosts = [
-    {
-      id: 'seed-1',
-      category: '잡담',
-      title: '솥뚜껑 포럼 오픈했습니다 🎉',
-      author: '운영자',
-      body: '어서 오세요! 여기는 솥뚜껑 포럼입니다.\n\n뜨거운 이야기도, 소소한 이야기도 다 환영해요.\n서로 존중하면서 즐겁게 이야기 나눠요.',
-      createdAt: now - 26 * HOUR,
-      likes: 12,
-      comments: [
-        { id: 'c1', author: '첫손님', body: '오픈 축하드려요!', createdAt: now - 25 * HOUR },
-        { id: 'c2', author: '지글지글', body: '이름 너무 좋네요 ㅋㅋ', createdAt: now - 20 * HOUR },
-      ],
-    },
-    {
-      id: 'seed-2',
-      category: '정보',
-      title: '솥뚜껑 삼겹살 맛있게 굽는 법',
-      author: '고기장인',
-      body: '1. 솥뚜껑을 충분히 달군다\n2. 기름이 가운데로 모이도록 고기를 바깥쪽에 올린다\n3. 모인 기름에 김치와 콩나물을 볶는다\n\n이게 진리입니다.',
-      createdAt: now - 8 * HOUR,
-      likes: 27,
-      comments: [
-        { id: 'c3', author: '배고픈사람', body: '새벽에 보면 안 되는 글…', createdAt: now - 6 * HOUR },
-      ],
-    },
-    {
-      id: 'seed-3',
-      category: '질문',
-      title: '포럼 글은 어디에 저장되나요?',
-      author: '궁금이',
-      body: '글을 써봤는데 다른 기기에서는 안 보이네요. 원래 그런가요?',
-      createdAt: now - 2 * HOUR,
-      likes: 3,
-      comments: [
-        { id: 'c4', author: '운영자', body: '지금은 브라우저(localStorage)에만 저장돼요. 나중에 서버를 붙이면 모두와 공유할 수 있어요!', createdAt: now - 1 * HOUR },
-      ],
-    },
-  ];
-
-  let posts = storage.get(STORAGE_KEY, null);
-  if (!Array.isArray(posts)) {
-    posts = seedPosts;
-    storage.set(STORAGE_KEY, posts);
-  }
   let liked = new Set(storage.get(LIKED_KEY, []));
-
-  const save = () => storage.set(STORAGE_KEY, posts);
   const saveLiked = () => storage.set(LIKED_KEY, [...liked]);
 
-  const uid = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  // ---------- Supabase API ----------
+  async function request(path, { method = 'GET', body, prefer } = {}) {
+    const headers = { apikey: SUPABASE_KEY };
+    if (body !== undefined) headers['Content-Type'] = 'application/json';
+    if (prefer) headers.Prefer = prefer;
+
+    let res;
+    try {
+      res = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+        method,
+        headers,
+        body: body === undefined ? undefined : JSON.stringify(body),
+      });
+    } catch {
+      throw new Error('서버에 연결하지 못했어요. 인터넷 연결을 확인하고 다시 시도해 주세요.');
+    }
+
+    const text = await res.text();
+    const data = text ? JSON.parse(text) : null;
+    if (!res.ok) {
+      const msg = data && (data.message || data.hint);
+      throw new Error(msg && /[가-힣]/.test(msg) ? msg : '잠시 문제가 생겼어요. 조금 뒤에 다시 시도해 주세요.');
+    }
+    return data;
+  }
+
+  const rpc = (name, args) => request(`rpc/${name}`, { method: 'POST', body: args });
+
+  const api = {
+    listPosts: () =>
+      request(`posts?select=${POST_FIELDS},comments(count)&order=created_at.desc&limit=500`),
+    getPost: async (id) => {
+      const rows = await request(
+        `posts?id=eq.${encodeURIComponent(id)}` +
+        `&select=${POST_FIELDS},comments(id,author,body,created_at)` +
+        '&comments.order=created_at.asc');
+      return rows[0] || null;
+    },
+    createPost: (p) => rpc('create_post', {
+      p_category: p.category, p_title: p.title, p_body: p.body,
+      p_author: p.author, p_password: p.password,
+    }),
+    deletePost: (id, password) => rpc('delete_post', { p_id: id, p_password: password }),
+    likePost: (id, delta) => rpc('like_post', { p_id: id, p_delta: delta }),
+    addComment: (postId, author, body) => request('comments', {
+      method: 'POST', body: { post_id: postId, author, body }, prefer: 'return=minimal',
+    }),
+  };
+
+  const isUuid = (s) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s);
 
   // ---------- helpers ----------
   const escapeHtml = (s) => String(s).replace(/[&<>"']/g, (c) => ({
     '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
   }[c]));
 
-  const timeAgo = (ts) => {
-    const diff = Math.max(0, Date.now() - ts);
+  const ts = (iso) => new Date(iso).getTime();
+
+  const timeAgo = (iso) => {
+    const t = ts(iso);
+    const diff = Math.max(0, Date.now() - t);
     const m = Math.floor(diff / 60000);
     if (m < 1) return '방금 전';
     if (m < 60) return `${m}분 전`;
@@ -92,10 +102,25 @@
     if (h < 24) return `${h}시간 전`;
     const d = Math.floor(h / 24);
     if (d < 7) return `${d}일 전`;
-    return new Date(ts).toLocaleDateString('ko-KR');
+    return new Date(t).toLocaleDateString('ko-KR');
   };
 
+  const commentCount = (p) => (p.comments && p.comments[0] ? p.comments[0].count : 0);
+
   const fromTemplate = (id) => document.getElementById(id).content.cloneNode(true);
+
+  const showLoading = () => {
+    app.innerHTML = '<p class="empty">불러오는 중…</p>';
+  };
+
+  const showError = (err, retry) => {
+    app.innerHTML = `<div class="card"><p>${escapeHtml(err.message)}</p>
+      <button type="button" class="btn" id="retryBtn">다시 시도</button></div>`;
+    document.getElementById('retryBtn').addEventListener('click', retry);
+  };
+
+  // 화면이 바뀐 뒤 늦게 도착한 응답이 화면을 덮어쓰지 않도록 하는 장치
+  let viewToken = 0;
 
   // ---------- theme ----------
   const themeToggle = document.getElementById('themeToggle');
@@ -114,10 +139,21 @@
 
   // ---------- views ----------
   const homeState = { category: '전체', query: '', sort: 'new' };
+  let posts = [];
 
-  function renderHome() {
-    app.replaceChildren(fromTemplate('tpl-home'));
+  async function renderHome() {
+    const token = ++viewToken;
     document.title = '솥뚜껑 포럼';
+    showLoading();
+    try {
+      posts = await api.listPosts();
+    } catch (err) {
+      if (token === viewToken) showError(err, renderHome);
+      return;
+    }
+    if (token !== viewToken) return;
+
+    app.replaceChildren(fromTemplate('tpl-home'));
 
     const tabs = document.getElementById('categoryTabs');
     ['전체', ...CATEGORIES].forEach((cat) => {
@@ -127,7 +163,15 @@
       b.textContent = cat;
       b.setAttribute('role', 'tab');
       b.setAttribute('aria-selected', String(cat === homeState.category));
-      b.addEventListener('click', () => { homeState.category = cat; renderHome(); });
+      b.addEventListener('click', () => {
+        homeState.category = cat;
+        tabs.querySelectorAll('button').forEach((x) => {
+          const on = x.textContent === cat;
+          x.classList.toggle('active', on);
+          x.setAttribute('aria-selected', String(on));
+        });
+        renderList();
+      });
       tabs.appendChild(b);
     });
 
@@ -152,9 +196,9 @@
       (!q || p.title.toLowerCase().includes(q) || p.body.toLowerCase().includes(q)));
 
     const sorters = {
-      new: (a, b) => b.createdAt - a.createdAt,
-      hot: (a, b) => b.likes - a.likes || b.createdAt - a.createdAt,
-      comments: (a, b) => b.comments.length - a.comments.length || b.createdAt - a.createdAt,
+      new: (a, b) => ts(b.created_at) - ts(a.created_at),
+      hot: (a, b) => b.likes - a.likes || ts(b.created_at) - ts(a.created_at),
+      comments: (a, b) => commentCount(b) - commentCount(a) || ts(b.created_at) - ts(a.created_at),
     };
     items = items.slice().sort(sorters[homeState.sort]);
 
@@ -166,9 +210,9 @@
           <p class="excerpt">${escapeHtml(p.body)}</p>
           <div class="meta" style="margin-top:8px">
             <span>${escapeHtml(p.author)}</span>
-            <span>${timeAgo(p.createdAt)}</span>
+            <span>${timeAgo(p.created_at)}</span>
             <span>♥ ${p.likes}</span>
-            <span>💬 ${p.comments.length}</span>
+            <span>💬 ${commentCount(p)}</span>
           </div>
         </a>
       </li>`).join('');
@@ -178,6 +222,7 @@
   }
 
   function renderWrite() {
+    ++viewToken;
     app.replaceChildren(fromTemplate('tpl-write'));
     document.title = '글쓰기 · 솥뚜껑 포럼';
 
@@ -186,39 +231,57 @@
     select.innerHTML = CATEGORIES.map((c) => `<option>${escapeHtml(c)}</option>`).join('');
     if (homeState.category !== '전체') select.value = homeState.category;
 
-    const lastAuthor = storage.get('sotttukkeong-forum:author', '');
-    form.elements.author.value = lastAuthor;
+    form.elements.author.value = storage.get(AUTHOR_KEY, '');
     form.elements.title.focus();
 
-    form.addEventListener('submit', (e) => {
+    const submitBtn = form.querySelector('button[type="submit"]');
+
+    form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const title = form.elements.title.value.trim();
       const body = form.elements.body.value.trim();
+      const password = form.elements.password.value;
       const author = form.elements.author.value.trim() || DEFAULT_AUTHOR;
       const err = document.getElementById('formError');
 
       if (!title) { err.textContent = '제목을 입력해주세요.'; form.elements.title.focus(); return; }
       if (!body) { err.textContent = '내용을 입력해주세요.'; form.elements.body.focus(); return; }
+      if (password.length < 4) {
+        err.textContent = '삭제 비밀번호를 4자 이상 입력해주세요.';
+        form.elements.password.focus();
+        return;
+      }
 
-      const post = {
-        id: uid(),
-        category: select.value,
-        title,
-        author,
-        body,
-        createdAt: Date.now(),
-        likes: 0,
-        comments: [],
-      };
-      posts.push(post);
-      save();
-      storage.set('sotttukkeong-forum:author', form.elements.author.value.trim());
-      location.hash = `#/post/${post.id}`;
+      err.textContent = '';
+      submitBtn.disabled = true;
+      submitBtn.textContent = '올리는 중…';
+      try {
+        const id = await api.createPost({ category: select.value, title, body, author, password });
+        storage.set(AUTHOR_KEY, form.elements.author.value.trim());
+        location.hash = `#/post/${id}`;
+      } catch (ex) {
+        err.textContent = ex.message;
+        submitBtn.disabled = false;
+        submitBtn.textContent = '올리기';
+      }
     });
   }
 
-  function renderPost(id) {
-    const post = posts.find((p) => p.id === id);
+  async function renderPost(id) {
+    const token = ++viewToken;
+    showLoading();
+
+    let post = null;
+    if (isUuid(id)) {
+      try {
+        post = await api.getPost(id);
+      } catch (err) {
+        if (token === viewToken) showError(err, () => renderPost(id));
+        return;
+      }
+    }
+    if (token !== viewToken) return;
+
     if (!post) {
       app.innerHTML = `<a class="back" href="#/">← 목록으로</a>
         <div class="card"><p>글을 찾을 수 없어요. 삭제되었을 수도 있어요.</p></div>`;
@@ -226,6 +289,7 @@
     }
     document.title = `${post.title} · 솥뚜껑 포럼`;
     const isLiked = liked.has(post.id);
+    const comments = post.comments || [];
 
     app.innerHTML = `
       <a class="back" href="#/">← 목록으로</a>
@@ -234,7 +298,7 @@
         <h1>${escapeHtml(post.title)}</h1>
         <div class="meta">
           <span>${escapeHtml(post.author)}</span>
-          <span title="${new Date(post.createdAt).toLocaleString('ko-KR')}">${timeAgo(post.createdAt)}</span>
+          <span title="${new Date(post.created_at).toLocaleString('ko-KR')}">${timeAgo(post.created_at)}</span>
         </div>
         <div class="post-body">${escapeHtml(post.body)}</div>
         <div class="post-actions">
@@ -246,11 +310,11 @@
       </article>
 
       <section class="comments">
-        <h2>댓글 ${post.comments.length}</h2>
+        <h2>댓글 ${comments.length}</h2>
         <ul class="comment-list">
-          ${post.comments.map((c) => `
+          ${comments.map((c) => `
             <li class="comment">
-              <div class="meta"><strong>${escapeHtml(c.author)}</strong><span>${timeAgo(c.createdAt)}</span></div>
+              <div class="meta"><strong>${escapeHtml(c.author)}</strong><span>${timeAgo(c.created_at)}</span></div>
               <p>${escapeHtml(c.body)}</p>
             </li>`).join('')}
         </ul>
@@ -260,34 +324,59 @@
             <textarea name="body" maxlength="1000" placeholder="댓글을 남겨주세요" aria-label="댓글" required></textarea>
             <button class="btn btn-primary" type="submit">등록</button>
           </div>
+          <p class="form-error" id="commentError" role="alert"></p>
         </form>
       </section>`;
 
-    document.getElementById('likeBtn').addEventListener('click', () => {
-      if (liked.has(post.id)) { liked.delete(post.id); post.likes = Math.max(0, post.likes - 1); }
-      else { liked.add(post.id); post.likes += 1; }
-      save(); saveLiked(); renderPost(id);
+    const likeBtn = document.getElementById('likeBtn');
+    likeBtn.addEventListener('click', async () => {
+      const wasLiked = liked.has(post.id);
+      likeBtn.disabled = true;
+      try {
+        const count = await api.likePost(post.id, wasLiked ? -1 : 1);
+        if (wasLiked) liked.delete(post.id); else liked.add(post.id);
+        saveLiked();
+        likeBtn.classList.toggle('liked', !wasLiked);
+        likeBtn.setAttribute('aria-pressed', String(!wasLiked));
+        document.getElementById('likeCount').textContent = count ?? post.likes;
+      } catch (ex) {
+        alert(ex.message);
+      } finally {
+        likeBtn.disabled = false;
+      }
     });
 
-    document.getElementById('deleteBtn').addEventListener('click', () => {
-      if (!confirm('이 글을 삭제할까요?')) return;
-      posts = posts.filter((p) => p.id !== post.id);
-      liked.delete(post.id);
-      save(); saveLiked();
-      location.hash = '#/';
+    document.getElementById('deleteBtn').addEventListener('click', async () => {
+      const password = prompt('글을 쓸 때 정한 삭제 비밀번호를 입력해주세요.');
+      if (password === null) return;
+      try {
+        const ok = await api.deletePost(post.id, password);
+        if (!ok) { alert('비밀번호가 맞지 않아요.'); return; }
+        liked.delete(post.id);
+        saveLiked();
+        location.hash = '#/';
+      } catch (ex) {
+        alert(ex.message);
+      }
     });
 
     const cform = document.getElementById('commentForm');
-    cform.elements.author.value = storage.get('sotttukkeong-forum:author', '');
-    cform.addEventListener('submit', (e) => {
+    const cbtn = cform.querySelector('button[type="submit"]');
+    cform.elements.author.value = storage.get(AUTHOR_KEY, '');
+    cform.addEventListener('submit', async (e) => {
       e.preventDefault();
       const body = cform.elements.body.value.trim();
       if (!body) { cform.elements.body.focus(); return; }
       const author = cform.elements.author.value.trim();
-      post.comments.push({ id: uid(), author: author || DEFAULT_AUTHOR, body, createdAt: Date.now() });
-      save();
-      storage.set('sotttukkeong-forum:author', author);
-      renderPost(id);
+      cbtn.disabled = true;
+      try {
+        await api.addComment(post.id, author || DEFAULT_AUTHOR, body);
+        storage.set(AUTHOR_KEY, author);
+        renderPost(id);
+      } catch (ex) {
+        document.getElementById('commentError').textContent = ex.message;
+        cbtn.disabled = false;
+      }
     });
   }
 
